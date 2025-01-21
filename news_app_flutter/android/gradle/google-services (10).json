@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "17235927142",
+    "project_id": "ipl-team-5c68a",
+    "storage_bucket": "ipl-team-5c68a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17235927142:android:71d2e8718fd3f656650da7",
+        "android_client_info": {
+          "package_name": "com.example.ipl_team"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgsEQaUGIRfMlQ9tk4Nq3f3dUZEbB4q_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17235927142:android:724903e02bfd535e650da7",
+        "android_client_info": {
+          "package_name": "com.example.news_app_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgsEQaUGIRfMlQ9tk4Nq3f3dUZEbB4q_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17235927142:android:ce20f8cd1a61950b650da7",
+        "android_client_info": {
+          "package_name": "com.example.trial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgsEQaUGIRfMlQ9tk4Nq3f3dUZEbB4q_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
