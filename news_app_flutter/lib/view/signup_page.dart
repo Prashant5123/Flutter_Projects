@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:news_app_flutter/controller/loader.dart';
- XFile? selectedFile;
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -29,6 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isObscure=true;
   bool _isComObscure=true;
  bool _isLoading=false;
+  XFile? selectedFile;
 
   // FirebaseAuth _firebaseAuth=FirebaseAuth.instance;
 

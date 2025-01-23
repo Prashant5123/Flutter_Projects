@@ -1,15 +1,18 @@
-import 'dart:developer';
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:news_app_flutter/model/inherited_state.dart';
+
 import 'package:news_app_flutter/view/home_screen.dart';
 import 'package:news_app_flutter/view/signup_page.dart';
+import 'package:provider/provider.dart';
 
-Map data={};
+import '../model/news.dart';
+
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -136,7 +139,8 @@ class _LoginScreen extends State {
 
                            
 
-                             data=response.data() as Map;
+                            Map  data=response.data() as Map;
+                            Provider.of<News>(context,listen: false).changeUserData(data) ;
 
                              
                               

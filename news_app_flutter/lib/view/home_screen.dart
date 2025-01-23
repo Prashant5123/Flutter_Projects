@@ -1,22 +1,20 @@
-import 'dart:convert';
-import 'dart:developer';
 
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:news_app_flutter/controller/getData.dart';
 import 'package:news_app_flutter/controller/loader.dart';
 import 'package:news_app_flutter/controller/local_storage.dart';
-import 'package:news_app_flutter/model/inherited_state.dart';
-import 'package:news_app_flutter/view/categories.dart';
+
 
 import 'package:news_app_flutter/view/profile_screen.dart';
 import 'package:news_app_flutter/view/web_view.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:provider/provider.dart';
 
-import 'splash_screen.dart';
+
+import '../model/news.dart';
+
  int articleReadHome = LocalStorage.articlesRead!;
 
 class HomeScreen extends StatefulWidget {
@@ -92,8 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     String search =
                         _searchController.text.trim().toString().toLowerCase();
                     if (_searchController.text.trim().isNotEmpty) {
-                      log("---");
-                      newsData = await Getdata.searchData(search);
+                      
+                      Map newsData = await Getdata.searchData(search);
+                      Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
                     }
 
                     setState(() {
@@ -148,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 });
                 if (!_isSearching) {
-                  newsData = await Getdata.homeData();
+                  Map newsData = await Getdata.homeData();
+                  Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
                 }
                 setState(() {});
               },
@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      body: (newsData["totalResults"] == 0)
+      body: (Provider.of<News>(context).newsData["totalResults"] == 0)
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -195,8 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       _isLoading = true;
                                     });
                                     category = categories[index];
-                                    newsData =
+                                    Map newsData =
                                         await Getdata.categoryData(category);
+
+                                        Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
 
                                     setState(() {
                                       _isLoading = false;
@@ -225,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: newsData["articles"].length,
+                      itemCount: Provider.of<News>(context).newsData["articles"].length,
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.all(10.0),
@@ -255,26 +257,26 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 children: [
                                   Visibility(
-                                    visible: (newsData["articles"][index]
+                                    visible: (Provider.of<News>(context).newsData["articles"][index]
                                                 ["title"] !=
                                             null)
                                         ? true
                                         : false,
                                     child: Text(
-                                      '"${newsData["articles"][index]["title"]}"',
+                                      '"${Provider.of<News>(context).newsData["articles"][index]["title"]}"',
                                       style: GoogleFonts.timmana(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   Visibility(
-                                    visible: (newsData["articles"][index]
+                                    visible: (Provider.of<News>(context).newsData["articles"][index]
                                                 ["description"] !=
                                             null)
                                         ? true
                                         : false,
                                     child: Text(
-                                      "${newsData["articles"][index]["description"]}",
+                                      "${Provider.of<News>(context).newsData["articles"][index]["description"]}",
                                       style: GoogleFonts.sahitya(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w500),
@@ -290,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Container(
                                         width: 150,
                                         child: Text(
-                                          "${newsData["articles"][index]["source"]["name"]}",
+                                          "${Provider.of<News>(context).newsData["articles"][index]["source"]["name"]}",
                                           style: GoogleFonts.sahitya(
                                               color: Colors.grey),
                                         ),
@@ -301,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Container(
                                         width: 150,
                                         child: Text(
-                                          "  ${newsData["articles"][index]["publishedAt"]}",
+                                          "  ${Provider.of<News>(context).newsData["articles"][index]["publishedAt"]}",
                                           style: GoogleFonts.sahitya(
                                               color: Colors.grey),
                                         ),
@@ -309,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                   Visibility(
-                                    visible: (newsData["articles"][index]
+                                    visible: (Provider.of<News>(context).newsData["articles"][index]
                                                 ["urlToImage"] !=
                                             null)
                                         ? true
@@ -325,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(8)),
                                         child: Image.network(
-                                          newsData["articles"][index]
+                                        Provider.of<News>(context).newsData["articles"][index]
                                                   ["urlToImage"]
                                               .toString(),
                                           fit: BoxFit.cover,
@@ -377,7 +379,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 
               });
               
-              newsData = await Getdata.homeData();
+              Map newsData = await Getdata.homeData();
+              Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
               setState(() {
                 
               });
@@ -388,7 +391,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 
               });
               
-              newsData = await Getdata.searchData("trending");
+              Map newsData = await Getdata.searchData("trending");
+              Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
               setState(() {
                 
               });

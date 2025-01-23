@@ -1,21 +1,20 @@
-import 'dart:io';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:news_app_flutter/controller/local_storage.dart';
-import 'package:news_app_flutter/model/inherited_state.dart';
-import 'package:news_app_flutter/view/home_screen.dart';
-import 'package:http/io_client.dart';
-import 'package:news_app_flutter/view/login_page.dart';
 
-Map newsData = {};
-String date = "";
+import 'package:news_app_flutter/view/login_page.dart';
+import 'package:provider/provider.dart';
+
+import '../model/news.dart';
+
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,9 +28,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+ 
     super.initState();
-    date = DateFormat("EEE d MMMM, yyyy").format(now);
+    
 
      LocalStorage.getSessionData();
     
@@ -50,7 +49,9 @@ class _SplashScreenState extends State<SplashScreen> {
       Uri url = Uri.parse(
           "https://newsapi.org/v2/top-headlines?country=us&apiKey=581d2ff60d4946edb8d21e31c471ce9a");
       http.Response response = await http.get(url);
-      newsData = await json.decode(response.body);
+      Map newsData = await json.decode(response.body);
+      // ignore: use_build_context_synchronously
+      Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
     } catch (er) {
       log("error");
       log(er.toString());

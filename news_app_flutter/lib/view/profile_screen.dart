@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app_flutter/controller/local_storage.dart';
-import 'package:news_app_flutter/model/inherited_state.dart';
+
 import 'package:news_app_flutter/view/home_screen.dart';
 import 'package:news_app_flutter/view/login_page.dart';
+import 'package:provider/provider.dart';
+
+import '../model/news.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -46,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                     ),
-                    child: Image.network(data["url"],fit: BoxFit.cover,),
+                    child: Image.network(Provider.of<News>(context).userData["url"],fit: BoxFit.cover,),
                   ),
                   SizedBox(
                     width: 20,
@@ -54,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Column(
                     children: [
                       Text(
-                        "${data["firstName"]} ${data["lastName"]}",
+                        "${Provider.of<News>(context).userData["firstName"]} ${Provider.of<News>(context).userData["lastName"]}",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),

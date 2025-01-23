@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:news_app_flutter/view/web_view.dart';
 
+
+// ignore: must_be_immutable
 class Categories extends StatefulWidget {
   Map categoryData;
    Categories({super.key,required this.categoryData });
