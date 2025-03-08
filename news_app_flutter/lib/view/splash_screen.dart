@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // ignore: use_build_context_synchronously
       Provider.of<News>(context,listen: false).changeNewsData(newsData) ;
     } catch (er) {
-      log("error");
+    
       log(er.toString());
     }
   }

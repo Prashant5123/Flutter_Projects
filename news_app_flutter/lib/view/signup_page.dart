@@ -1,4 +1,5 @@
 
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:news_app_flutter/controller/loader.dart';
+import "package:intl/intl.dart";
 
 
 class SignUpScreen extends StatefulWidget {
@@ -225,9 +227,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         
                             await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailSiginController.text, password: _passwordSiginController.text);
                             setState(() {
-                              _isLoading=false;
+                              _isLoading=true;
                             });
                              DateTime now = DateTime.now();
+                             String date=DateFormat.MMMMEEEEd().format(now);
+                             log(date);
+                             
                             await FirebaseStorage.instance
                                 .ref()
                                 .child("${now}_${_emailSiginController.text}")

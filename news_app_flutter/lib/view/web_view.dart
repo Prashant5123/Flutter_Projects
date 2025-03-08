@@ -58,40 +58,6 @@ void didChangeDependencies() {
 
    
  
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Required for Android WebView compatibility
-   
-
-  //   _controller = WebViewController()
-  //     ..loadRequest(Uri.parse(Provider.of<News>(context).newsData["articles"][widget.index]["url"])) 
-  //     ..setJavaScriptMode(JavaScriptMode.unrestricted)
-  //     ..setNavigationDelegate(
-  //       NavigationDelegate(
-  //         onPageStarted: (url) {
-  //           setState(() {
-  //             _isLoading = true; 
-             
-  //           });
-  //         },
-  //         onPageFinished: (url) {
-  //           setState(() {
-  //             _isLoading = false; 
-  //           });
-  //         },
-  //         onWebResourceError: (error) {
-  //           setState(() {
-  //             _isLoading = false; 
-            
-  //           });
-  //         },
-  //       ),
-  //   );
-
-    
-
-
 
       
 

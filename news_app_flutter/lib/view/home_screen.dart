@@ -39,24 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  // Map categoryImgUrl = {
-  //   "Business": "assets/jpg/Business.jpg",
-  //   "crime": "assets/jpg/crime.jpg",
-  //   "sports": "assets/jpg/sports.jpg",
-  //   "education": "assets/jpg/education.jpg",
-  //   "entertainment": "assets/jpg/entertainment.jpg",
-  //   "environment": "assets/jpg/environment.jpg",
-  //   "food": "assets/jpg/food.jpg",
-  //   "health": "assets/jpg/health.jpg",
-  //   "lifestyle": "assets/jpg/lifestyle.jpg",
-  //   "politics": "assets/jpg/politics.jpg",
-  //   "science": "assets/jpg/science.png",
-  //   "technology": "assets/jpg/technology.jpg",
-  //   "tourism": "assets/jpg/tourism.jpg",
-  //   "world": "assets/jpg/world.jpg"
-  // };
 
-  List categories = [
+
+  List<String> categories = [
     "business",
     "sports",
     "general",
@@ -99,20 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _isLoading = false;
                     });
                   },
-                  // onEditingComplete: () async{
-                  //   setState(() {
-                  //     _isLoading=true;
-                  //   });
-                  //   String search=_searchController.text.trim().toString().toLowerCase();
-                  //   if(_searchController.text.trim().isNotEmpty){
-                  //     newsData=await Getdata.searchData(search);
-                  //   }
-
-                  //   setState(() {
-                  //     _isLoading=false;
-                  //   });
-                  //   log("---");
-                  // },
+                
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.all(5),
@@ -174,9 +146,35 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           : Stack(children: [
+
+
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+DropdownButton<String>(
+      //value: dropdownValue,
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? value) {
+        // This is called when the user selects an item.
+        setState(() {
+         // dropdownValue = value!;
+        });
+      },
+      items: categories.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    ),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: SizedBox(
