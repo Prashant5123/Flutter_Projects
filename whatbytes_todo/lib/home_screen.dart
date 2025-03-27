@@ -636,7 +636,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: 20,
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -701,7 +701,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   SizedBox(
                     height: 40,
-                    width: 131,
+                    width: 145,
                     child: DropdownButtonFormField<String>(
                       style: GoogleFonts.poppins(
                           color: Colors.black,
