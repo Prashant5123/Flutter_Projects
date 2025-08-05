@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:whatbytes_todo/local_data.dart';
 import 'package:whatbytes_todo/riverpod.dart';
 
 class AddTasks extends ConsumerStatefulWidget {
@@ -33,9 +34,10 @@ class _AddTasksState extends ConsumerState<AddTasks> {
         "priority":priority,
         "status":"Incomplete"
       };
-
-      await FirebaseFirestore.instance.collection("Tasks").add(data);
-      log("Task added");
+      log("---------------------------");
+      log(SessionData.emailId!);
+      await FirebaseFirestore.instance.collection("user").doc(SessionData.emailId).collection("tasks").add(data);
+      // log("Task added");
       
       setState(() {
         ref.read(riverPodHard).getFirebaseData();

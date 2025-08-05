@@ -376,11 +376,11 @@ class _RegisterPageState extends State<RegisterPage> {
           organizationDomains
               .map(
                 (domain) =>
-                    DropdownMenuItem(value: domain, child: Text(domain)),
+                    DropdownMenuItem(value: domain, child: Text(domain,overflow: TextOverflow.ellipsis,)),
               )
               .toList(),
       onChanged: (value) => setState(() => selectedDomain = value),
-      hint: Expanded(child: Text('Select Domain')),
+      hint: Text('Select Domain',overflow: TextOverflow.ellipsis),
     );
   }
 

@@ -1,3 +1,6 @@
+import 'package:financial_analyzer/features/camera/presentation/screens/new_order.dart';
+import 'package:financial_analyzer/features/camera/presentation/screens/order_details.dart';
+import 'package:financial_analyzer/features/dashboard/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,6 +70,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'export',
         builder: (context, state) => const ExportExcelScreen(),
       ),
+
+      GoRoute(
+        path: '/homescreen',
+        name: 'homescreen',
+        builder: (context, state) => const HomeScreen(),
+      ),
+
+      GoRoute(
+        path: '/neworder',
+        name: 'neworder',
+        builder: (context, state) => const NewOrder(),
+      ),
+
+
+      GoRoute(
+        path: '/orderdetails',
+        name: 'orderdetails',
+        builder: (context, state) => const OrderDetails(),
+      ),
     ],
   );
 });
@@ -101,7 +123,7 @@ class RouterNotifier extends ChangeNotifier {
     // If logged in and on auth route, go to dashboard
     if (isLoggedIn && isAuthRoute) {
       print('🔄 Redirecting to dashboard - user already authenticated');
-      return '/dashboard';
+      return '/homescreen';
     }
     
     // No redirect needed

@@ -2,11 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:whatbytes_todo/add_tasks.dart';
-import 'package:whatbytes_todo/filter_tasks.dart';
-import 'package:whatbytes_todo/home_screen.dart';
+import 'package:whatbytes_todo/local_data.dart';
 
-import 'package:whatbytes_todo/riverpod.dart';
 
 class RiverpodModel extends ChangeNotifier {
   String date;
@@ -17,9 +14,7 @@ class RiverpodModel extends ChangeNotifier {
   void getFirebaseData() async {
     firebasData = [];
     QuerySnapshot response = await FirebaseFirestore.instance
-        .collection("Tasks")
-        .orderBy("date")
-        .get();
+        .collection("user").doc(SessionData.emailId).collection("tasks").orderBy("date").get();
     for (var value in response.docs) {
       Map<String, dynamic> taskData = value.data() as Map<String, dynamic>;
       taskData["id"] = value.id;
@@ -28,7 +23,7 @@ class RiverpodModel extends ChangeNotifier {
     }
     notifyListeners();
 
-    log("${firebasData}");
+    log("$firebasData");
   }
 
  

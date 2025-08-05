@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:whatbytes_todo/home_screen.dart';
+import 'package:whatbytes_todo/local_data.dart';
 import 'package:whatbytes_todo/login_screen.dart';
 import 'package:whatbytes_todo/riverpod.dart';
 
@@ -19,8 +20,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     getDate();
-
-     ref.read(riverPodHard).getFirebaseData();
+    if(SessionData.isLogin==true){
+       ref.read(riverPodHard).getFirebaseData();
+    }
+    
   }
 
   void getDate() {
@@ -30,7 +33,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      duration: 3000,
+      duration: 2000,
       splashIconSize: 400,
       backgroundColor: const Color.fromARGB(255, 91, 85, 243),
       splash: Center(
@@ -68,7 +71,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           ],
         ),
       ),
-      nextScreen: LoginScreen(),
+      nextScreen:(SessionData.isLogin==null || SessionData.isLogin==false)? LoginScreen():HomeScreen(),
     );
   }
 }

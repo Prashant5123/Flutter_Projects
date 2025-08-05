@@ -155,14 +155,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 onPressed: isLoading ? null : _handleLogin,
                                 gradient: AppTheme.primaryGradient,
                                 child: isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ? const Center(
+                                      child: SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                          
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
                                         ),
-                                      )
+                                    )
                                     : const Text(
                                         'Login',
                                         style: TextStyle(

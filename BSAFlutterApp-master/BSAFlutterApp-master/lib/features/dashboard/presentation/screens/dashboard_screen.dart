@@ -71,21 +71,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                child: const ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Logout'),
-                ),
-                onTap: () => _showLogoutDialog(context),
-              ),
-            ],
-          ),
-        ],
+        title: const Text('Pdf Section'),
+        // actions: [
+        //   PopupMenuButton(
+        //     icon: const Icon(Icons.more_vert),
+        //     itemBuilder: (context) => [
+        //       PopupMenuItem(
+        //         child: const ListTile(
+        //           leading: Icon(Icons.logout),
+        //           title: Text('Logout'),
+        //         ),
+        //         onTap: () => _showLogoutDialog(context),
+        //       ),
+        //     ],
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -98,9 +98,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Section
-              _buildWelcomeSection(user),
+              //_buildWelcomeSection(user),
               
-              const SizedBox(height: 24),
+              //const SizedBox(height: 24),
               
               // Quick Actions
               _buildQuickActions(),
@@ -209,6 +209,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 itemCount: actions.length,
                 itemBuilder: (context, index) {
                   final action = actions[index];
+
                   return AnimationConfiguration.staggeredGrid(
                     position: index,
                     duration: const Duration(milliseconds: 600),

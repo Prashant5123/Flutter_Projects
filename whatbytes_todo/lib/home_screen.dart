@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:whatbytes_todo/local_data.dart';
+import 'package:whatbytes_todo/login_screen.dart';
 import 'package:whatbytes_todo/riverpod.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -25,6 +27,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(riverPodHard).getFirebaseData();
+  }
 
   void clearController() {
     _titleController.clear();
@@ -46,18 +54,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       };
 
       if (isNew) {
-         
-        await FirebaseFirestore.instance.collection("Tasks").add(data);
+        await FirebaseFirestore.instance
+            .collection("user")
+            .doc(SessionData.emailId)
+            .collection("tasks")
+            .add(data);
       } else {
         Map<String, dynamic> _data = {
-        "title": _titleController.text,
-        "description": _descriptionController.text,
-        "date": _dateController.text,
-        "priority": priority,
-        "status": ref.read(riverPodHard).firebasData[index]["status"]
-      };
+          "title": _titleController.text,
+          "description": _descriptionController.text,
+          "date": _dateController.text,
+          "priority": priority,
+          "status": ref.read(riverPodHard).firebasData[index]["status"]
+        };
         await FirebaseFirestore.instance
-            .collection("Tasks")
+            .collection("user")
+            .doc(SessionData.emailId)
+            .collection("tasks")
             .doc(ref.watch(riverPodHard).firebasData[index]["id"])
             .update(_data);
       }
@@ -140,11 +153,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                             
                             ),
                           ),
                         ),
@@ -169,7 +180,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   horizontal: 10, vertical: 5),
                               hintText: "Enter Description",
                               hintStyle: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500, color: Colors.grey),
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               focusedBorder: OutlineInputBorder(
@@ -204,7 +216,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 EdgeInsets.symmetric(horizontal: 10),
                             hintText: "Enter Due Date",
                             hintStyle: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w500, color: Colors.grey),
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             focusedBorder: OutlineInputBorder(
@@ -232,7 +245,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 EdgeInsets.symmetric(horizontal: 10),
                             hintText: "Select Priority",
                             hintStyle: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w400,),
+                              fontWeight: FontWeight.w400,
+                            ),
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             focusedBorder: OutlineInputBorder(
@@ -299,6 +313,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: AppBar(
+          actions: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 10,
+                  ),
+                  child: GestureDetector(
+                      onTap: () {
+                        SessionData.setSessionData(isLogin: false, emailId: '');
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: Icon(
+                        Icons.logout_outlined,
+                        color: Colors.white,
+                        size: 30,
+                      )),
+                )
+              ],
+            ),
+          ],
           backgroundColor: const Color.fromARGB(255, 91, 85, 243),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +451,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 GestureDetector(
                                   onTap: () async {
                                     await FirebaseFirestore.instance
-                                        .collection("Tasks")
+                                        .collection("user")
+                                        .doc(SessionData.emailId)
+                                        .collection("tasks")
                                         .doc(ref
                                             .read(riverPodHard)
                                             .firebasData[index]["id"])
@@ -535,7 +579,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           "status": "Completed"
                                         };
                                         await FirebaseFirestore.instance
-                                            .collection("Tasks")
+                                            .collection("user")
+                                            .doc(SessionData.emailId)
+                                            .collection("tasks")
                                             .doc(ref
                                                 .watch(riverPodHard)
                                                 .firebasData[index]["id"])
@@ -558,7 +604,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           "status": "Incompleted"
                                         };
                                         await FirebaseFirestore.instance
-                                            .collection("Tasks")
+                                            .collection("user")
+                                            .doc(SessionData.emailId)
+                                            .collection("tasks")
                                             .doc(ref
                                                 .watch(riverPodHard)
                                                 .firebasData[index]["id"])
@@ -607,10 +655,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget screenType(int index) {
     if (index == 2) {
-      
       return filter();
     } else {
-      filterData=[];
+      filterData = [];
       return home();
     }
   }

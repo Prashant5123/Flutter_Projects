@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:whatbytes_todo/home_screen.dart';
+
+import 'package:whatbytes_todo/local_data.dart';
 import 'package:whatbytes_todo/splash_screen.dart';
 
 void main()async {
@@ -14,6 +15,8 @@ void main()async {
   }catch (e){
     log("$e");
   }
+
+  SessionData.getSessionData();
   runApp(ProviderScope(child: MainApp()));
 }
 

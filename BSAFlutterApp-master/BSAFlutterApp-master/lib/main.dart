@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io' show Platform;
 
+import 'package:financial_analyzer/features/Graph/mainapp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,10 @@ import 'core/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // runApp(
+  //   const MainApp()
+  // );
 
   // Initialize logger
   AppLogger.init();
