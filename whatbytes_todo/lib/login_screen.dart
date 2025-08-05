@@ -250,9 +250,9 @@ class _LoginScreen extends ConsumerState {
                                 },
                                 child: SizedBox(
                                   height: 30,
-                                  width: 60,
+                        
                                   child: Text(
-                                    "Sign in",
+                                    "Sign Up",
                                     style: GoogleFonts.quicksand(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
