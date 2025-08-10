@@ -32,6 +32,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     ref.read(riverPodHard).getFirebaseData();
+    getName();
+  }
+
+  void getName() async {
+    DocumentSnapshot response = await FirebaseFirestore.instance
+        .collection("user")
+        .doc(SessionData.emailId)
+        .get();
+
+    Map data = response.data() as Map;
+
+    ref.read(riverPodHard).name = data["firstName"];
   }
 
   void clearController() {
