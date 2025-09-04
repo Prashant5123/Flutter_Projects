@@ -7,8 +7,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:jobmanagement/custom_widgets.dart';
-import 'package:jobmanagement/firebase_operations.dart';
+
 import 'package:jobmanagement/admin_home_screen.dart';
+import 'package:jobmanagement/session_data.dart';
 import 'package:jobmanagement/signup_screen.dart';
 import 'package:jobmanagement/state_management.dart';
 import 'package:jobmanagement/user_home_screen.dart';
@@ -66,7 +67,6 @@ class _SigninScreen extends State<SigninScreen> {
     try {
       FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
-      // 1️⃣ Fetch Firestore user data
       DocumentSnapshot data = await firebaseFirestore
           .collection(selectedPanel)
           .doc(_emailLoginController.text.trim())
@@ -75,21 +75,19 @@ class _SigninScreen extends State<SigninScreen> {
       if (!data.exists || data.data() == null) {
         throw FirebaseAuthException(
           code: "user-not-found",
-          message: "No user found in this panel",
+          message: "user-not-found",
         );
       }
 
       Map<String, dynamic> userData = data.data()! as Map<String, dynamic>;
 
-      // 2️⃣ Check panel match
       if ((userData["panel"] ?? "") != selectedPanel) {
         throw FirebaseAuthException(
-          code: "invalid-panel",
-          message: "User not allowed in this panel",
+          code: "user-not-found",
+          message: "user-not-found",
         );
       }
 
-      // 3️⃣ Fill user details
       _userDetailsController.fillUserDetail(
         firstName: userData["firstName"] ?? "",
         lastName: userData["lastName"] ?? "",
@@ -97,19 +95,26 @@ class _SigninScreen extends State<SigninScreen> {
         panel: userData["panel"] ?? "",
       );
 
-      // 4️⃣ Firebase Auth login
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailLoginController.text.trim(),
         password: _passwordLoginController.text.trim(),
       );
 
-      // 5️⃣ Fetch jobs
       _userDetailsController.allJobs.clear();
       if (selectedPanel == "Admin") {
         _userDetailsController.getAllJobs();
       } else {
-         _userDetailsController.getUserAllJobs();
+        _userDetailsController.getUserAllJobs();
+        
       }
+
+      await SessionData.setSessionData(
+        email: _emailLoginController.text.trim(),
+        isLogin: true,
+        panel: selectedPanel,
+        name: userData["firstName"],
+        lastName: userData["lastName"]
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -118,7 +123,6 @@ class _SigninScreen extends State<SigninScreen> {
         ),
       );
 
-      // 6️⃣ Navigate to Home
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) =>
@@ -126,18 +130,19 @@ class _SigninScreen extends State<SigninScreen> {
         ),
       );
     } on FirebaseAuthException catch (error) {
-      String formatedError = error.message ??
-          error.code
-              .split("-")
-              .map((word) => "${word[0].toUpperCase()}${word.substring(1)}")
-              .join(" ");
+      log("${error.code}");
+      log("${error.message}");
+     
+      String formattedError = error.code
+          .split("-")
+          .map((word) => "${word[0].toUpperCase()}${word.substring(1)}")
+          .join(" ");
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(formatedError),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(formattedError), backgroundColor: Colors.red),
       );
     } catch (e) {
+       log("${e}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("An unexpected error occurred: $e"),
@@ -165,10 +170,12 @@ class _SigninScreen extends State<SigninScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 150),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Login",
@@ -181,14 +188,25 @@ class _SigninScreen extends State<SigninScreen> {
                         Center(
                           child: ToggleButtons(
                             borderWidth: 2,
-                            selectedBorderColor: const Color.fromARGB(255, 91, 85, 243),
+                            selectedBorderColor: const Color.fromARGB(
+                              255,
+                              91,
+                              85,
+                              243,
+                            ),
                             isSelected: selectedPanelList,
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10),
+                            ),
                             selectedColor: Colors.white,
                             color: Colors.black,
                             fillColor: const Color.fromARGB(255, 91, 85, 243),
                             onPressed: (index) {
-                              for (int i = 0; i < selectedPanelList.length; i++) {
+                              for (
+                                int i = 0;
+                                i < selectedPanelList.length;
+                                i++
+                              ) {
                                 selectedPanelList[i] = i == index;
                               }
                               selectedPanel = panelList[index];
@@ -196,11 +214,15 @@ class _SigninScreen extends State<SigninScreen> {
                             },
                             children: [
                               SizedBox(
-                                width: (MediaQuery.of(context).size.width - 60) / 2,
+                                width:
+                                    (MediaQuery.of(context).size.width - 60) /
+                                    2,
                                 child: Center(child: Text(panelList[0])),
                               ),
                               SizedBox(
-                                width: (MediaQuery.of(context).size.width - 60) / 2,
+                                width:
+                                    (MediaQuery.of(context).size.width - 60) /
+                                    2,
                                 child: Center(child: Text(panelList[1])),
                               ),
                             ],
@@ -236,7 +258,12 @@ class _SigninScreen extends State<SigninScreen> {
                           height: 50,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 91, 85, 243),
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                91,
+                                85,
+                                243,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -297,7 +324,12 @@ class _SigninScreen extends State<SigninScreen> {
                                     style: GoogleFonts.quicksand(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color.fromARGB(255, 91, 85, 243),
+                                      color: const Color.fromARGB(
+                                        255,
+                                        91,
+                                        85,
+                                        243,
+                                      ),
                                     ),
                                   ),
                                 ),

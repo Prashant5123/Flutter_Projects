@@ -18,6 +18,11 @@ dependencies:
   intl: ^0.20.2
   flutter_slidable: ^4.0.1
   get: ^4.7.2
+  file_picker: ^10.3.2
+  firebase_storage: ^13.0.1
+  open_file: ^3.5.10
+  syncfusion_flutter_pdfviewer: ^30.2.7
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

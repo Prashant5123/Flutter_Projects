@@ -13,7 +13,8 @@ class UserDetails extends GetxController {
   List allJobs = <Map<String, dynamic>>[].obs;
   List appliedUsers = <Map<String, dynamic>>[].obs;
   List userAppliedJobs = <Map<String, dynamic>>[].obs;
-  List displayedJobs=<Map<String, dynamic>>[].obs;
+  List displayedJobs = <Map<String, dynamic>>[].obs;
+  List previousJobs= <Map<String, dynamic>>[].obs;
 
   void fillUserDetail({
     required String firstName,
@@ -42,8 +43,7 @@ class UserDetails extends GetxController {
     }
   }
 
-  void getUserAllJobs() async {
-  
+  Future getUserAllJobs() async {
     allJobs.clear();
     await getuserAppliedJobs();
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
@@ -96,4 +96,46 @@ class UserDetails extends GetxController {
     }
     log("${userAppliedJobs}");
   }
+
+  Future getUserSearchJobs({required String search}) async {
+    allJobs.clear();
+    await getuserAppliedJobs();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    QuerySnapshot response = await firebaseFirestore
+        .collection("Admin")
+        .doc("prashant@gmail.com")
+        .collection("Jobs")
+        .get();
+
+    List userNotAppliedJobs = [];
+    for (var value in response.docs) {
+      Map<String, dynamic> jobData = value.data() as Map<String, dynamic>;
+      jobData["id"] = value.id;
+      bool alreadyApplied = userAppliedJobs.any(
+        (job) => job["id"] == jobData["id"],
+      );
+
+      if (!alreadyApplied) {
+        userNotAppliedJobs.add(jobData);
+      }
+    }
+
+    for (var jobData in userNotAppliedJobs) {
+     
+      final lowerCaseSearch = search.toLowerCase();
+      bool matchesSearch = jobData.values.any((value) {
+        if (value is String) {
+          return value.toLowerCase().contains(lowerCaseSearch);
+        }
+        return false;
+      });
+
+      
+      if (matchesSearch) {
+        allJobs.add(jobData);
+      }
+    }
+  }
+
+  
 }

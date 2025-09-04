@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -6,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:jobmanagement/applied_users.dart';
 import 'package:jobmanagement/custom_widgets.dart';
-import 'package:jobmanagement/firebase_operations.dart';
+import 'package:jobmanagement/session_data.dart';
 import 'package:jobmanagement/signin_screen.dart';
 import 'package:jobmanagement/state_management.dart';
 
@@ -33,6 +35,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     DateTime dateTime = DateTime.now();
     date = DateFormat("EEEE, dd MMMM").format(dateTime);
     super.initState();
+    log("${_userDetailsController.email.value}");
   }
 
   void clearController() {
@@ -44,11 +47,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   Widget screenType(int index) {
     if (index == 2) {
-      // return filter();
-      return SizedBox();
+     
+      return adminPage();
     } else {
       //filterData = [];
-      return AdminHomeScreen();
+      return home();
     }
   }
 
@@ -59,7 +62,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         _postedByController.text.trim().isNotEmpty &&
         _salaryController.text.trim().isNotEmpty) {
       DateTime dateTime = DateTime.now();
-      String formatedDate = DateFormat("M/d/y").format(dateTime);
+      String formatedDate = DateFormat("d/M/y").format(dateTime);
       Map<String, dynamic> data = {
         "title": _titleController.text.trim(),
         "description": _descriptionController.text.trim(),
@@ -103,7 +106,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       );
     } else {
       setState(() {
-        // selectedPage = 0;
+        selectedPage = 0;
       });
       Navigator.pop(context);
       ScaffoldMessenger.of(
@@ -267,7 +270,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       },
     ).whenComplete(() {
       setState(() {
-        // selectedPage = 0; // Ensure Home is selected
+        selectedPage = 0;
       });
     });
   }
@@ -286,7 +289,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
                     onTap: () {
-                      // SessionData.setSessionData(isLogin: false, emailId: '');
+                      SessionData.setSessionData(
+                        email: "",
+                        isLogin: false,
+                        panel: "",
+                        name: "",
+                        lastName: "",
+                      );
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => SigninScreen()),
                         (Route<dynamic> route) => false,
@@ -321,7 +330,114 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         ),
       ),
 
-      body: SafeArea(
+      body:screenType(selectedPage) , bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color.fromARGB(255, 91, 85, 243),
+        unselectedItemColor: Colors.white,
+        selectedItemColor: Colors.black,
+        currentIndex: selectedPage,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          log("$index");
+          setState(() {
+            selectedPage = index;
+            if (index == 1) {
+              _isNew = true;
+              openBottomSheet(_isNew, -1);
+            } else {
+              screenType(index);
+            }
+          });
+        },
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add Job"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
+    );
+  }
+
+  Widget adminPage() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 20),
+
+          Container(
+            height: 100,
+            width: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey,
+            ),
+            child: Icon(Icons.person, size: 100),
+          ),
+
+          SizedBox(height: 50),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Name: ",
+
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  " ${_userDetailsController.firstName}  ${_userDetailsController.lastName}",
+
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 20),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Email: ",
+
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  " ${_userDetailsController.email}",
+
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget home(){
+    return SafeArea(
         child: Column(
           children: [
             SizedBox(height: 20),
@@ -558,33 +674,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color.fromARGB(255, 91, 85, 243),
-        unselectedItemColor: Colors.white,
-        selectedItemColor: Colors.black,
-        currentIndex: selectedPage,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            selectedPage = index;
-            if (index == 1) {
-              _isNew = true;
-              openBottomSheet(_isNew, -1);
-            } else {
-              screenType(index);
-            }
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add Job"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.filter_alt_outlined),
-            label: "Filters",
-          ),
-        ],
-      ),
-    );
+      );
+     
   }
 }

@@ -29,7 +29,7 @@ class _AppliedJobsState extends State<AppliedJobs> {
           backgroundColor: const Color.fromARGB(255, 91, 85, 243),
           title: Text(
             "Jobs you applied",
-            style: GoogleFonts.poppins(color: Colors.white, fontSize: 22),
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 18),
           ),
         ),
       ),

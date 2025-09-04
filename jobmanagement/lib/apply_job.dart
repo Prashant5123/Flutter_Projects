@@ -1,8 +1,13 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:open_file/open_file.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jobmanagement/state_management.dart';
 
@@ -17,6 +22,43 @@ class _ApplyJobState extends State<ApplyJob> {
   final UserDetails _userDetailsController = Get.put(UserDetails());
   final TextEditingController _textEditingController = TextEditingController();
   String? _selectedValue;
+  String? selectedFilePath;
+  File? selectedFile;
+  bool isloading = false;
+  String? formatedPath;
+  String? downloadUrl;
+
+  Future selectPdf() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ["pdf"],
+    );
+
+    if (result != null) {
+      selectedFilePath = result.files.single.path;
+      selectedFile = File(selectedFilePath!);
+      formatedPath = result.files.single.name;
+    }
+
+    log("${selectedFilePath}");
+    setState(() {});
+  }
+
+  Future uploadPdf() async {
+    String filename = DateTime.now().microsecondsSinceEpoch.toString();
+    try {
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref()
+          .child("${formatedPath!.split(".").first}_$filename.pdf")
+          .putFile(selectedFile!);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      downloadUrl = await taskSnapshot.ref.getDownloadURL();
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -331,30 +373,72 @@ class _ApplyJobState extends State<ApplyJob> {
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.upload,
-                        color: Color.fromARGB(255, 91, 85, 243),
-                      ),
-                      Text(
-                        "Upload Resume",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color.fromARGB(255, 91, 85, 243),
+                  child: (selectedFilePath == null)
+                      ? GestureDetector(
+                          onTap: () async {
+                            await selectPdf();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.upload,
+                                color: Color.fromARGB(255, 91, 85, 243),
+                              ),
+                              Text(
+                                "Upload Resume",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color.fromARGB(255, 91, 85, 243),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  OpenFile.open(selectedFilePath);
+                                },
+                                child: Text(
+                                  "$formatedPath",
+
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+
+                            IconButton(
+                              onPressed: () {
+                                selectedFilePath = null;
+                                selectedFile = null;
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                Icons.close,
+                                size: 15,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
               SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "Max file size: 10Mb. File type - PDF, DOC, DOCX",
+                  "Max file size: 10Mb. File type - PDF",
 
                   style: GoogleFonts.poppins(
                     fontSize: 16,
@@ -382,67 +466,98 @@ class _ApplyJobState extends State<ApplyJob> {
                         Color.fromARGB(255, 91, 85, 243),
                       ),
                     ),
-                    onPressed: () async {
-                      if (_selectedValue != null &&
-                          _textEditingController.text.trim().isNotEmpty) {
-                        DateTime dateTime = DateTime.now();
-                        String formatedDate = DateFormat(
-                          'd/M/y',
-                        ).format(dateTime);
-                        try {
-                          FirebaseFirestore firebaseFirestore =
-                              FirebaseFirestore.instance;
-                          Map<String, dynamic> data = {
-                            "userName":
-                                "${_userDetailsController.firstName} ${_userDetailsController.lastName}",
-                            "userEmail": "${_userDetailsController.email}",
-                            "whyHire": _textEditingController.text.trim(),
-                            "availability": _selectedValue,
-                            "appliedAt": formatedDate,
-                          };
-                          await firebaseFirestore
-                              .collection("Admin")
-                              .doc("prashant@gmail.com")
-                              .collection("Jobs")
-                              .doc(_userDetailsController.allJobs[index]["id"])
-                              .collection("applied_users")
-                              .add(data);
+                    onPressed: (isloading)
+                        ? null
+                        : () async {
+                            if (_selectedValue != null &&
+                                _textEditingController.text.trim().isNotEmpty &&
+                                selectedFile != null &&
+                                selectedFilePath != null) {
+                              setState(() {
+                                isloading = true;
+                              });
+                              await uploadPdf();
+                              DateTime dateTime = DateTime.now();
+                              String formatedDate = DateFormat(
+                                'd/M/y',
+                              ).format(dateTime);
+                              try {
+                                FirebaseFirestore firebaseFirestore =
+                                    FirebaseFirestore.instance;
+                                Map<String, dynamic> data = {
+                                  "userName":
+                                      "${_userDetailsController.firstName} ${_userDetailsController.lastName}",
+                                  "userEmail":
+                                      "${_userDetailsController.email}",
+                                  "whyHire": _textEditingController.text.trim(),
+                                  "availability": _selectedValue,
+                                  "appliedAt": formatedDate,
+                                  "resumeUrl": downloadUrl,
+                                  "resumeFileName": formatedPath,
+                                };
+                                await firebaseFirestore
+                                    .collection("Admin")
+                                    .doc("prashant@gmail.com")
+                                    .collection("Jobs")
+                                    .doc(
+                                      _userDetailsController
+                                          .allJobs[index]["id"],
+                                    )
+                                    .collection("applied_users")
+                                    .add(data);
 
-                          Map<String, dynamic> appliedId =
-                              _userDetailsController.allJobs[index];
-                          appliedId["appliedAt"] = formatedDate;
-                          appliedId["id"] =
-                              _userDetailsController.allJobs[index]["id"];
-                          await firebaseFirestore
-                              .collection("User")
-                              .doc(_userDetailsController.email.value)
-                              .collection("applied_jobs")
-                              .add(appliedId);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Successfully applied for job"),
-                              backgroundColor: Colors.green,
+                                Map<String, dynamic> appliedId =
+                                    _userDetailsController.allJobs[index];
+                                appliedId["appliedAt"] = formatedDate;
+                                appliedId["resumeLink"] = downloadUrl;
+                                appliedId["id"] =
+                                    _userDetailsController.allJobs[index]["id"];
+                                await firebaseFirestore
+                                    .collection("User")
+                                    .doc(_userDetailsController.email.value)
+                                    .collection("applied_jobs")
+                                    .add(appliedId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Successfully applied for job",
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                  setState(() {
+                                isloading = false;
+                              });
+
+                              _userDetailsController.getUserAllJobs();
+                                Navigator.of(context).pop();
+                              } catch (e) {}
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Please fill required fields"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                    child: (isloading)
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
                             ),
-                          );
-                          Navigator.of(context).pop();
-                        } catch (e) {}
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Please fill required fields"),
-                            backgroundColor: Colors.red,
+                          )
+                        : Text(
+                            "Submit",
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                        );
-                      }
-                    },
-                    child: Text(
-                      "Submit",
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ),
               ),
